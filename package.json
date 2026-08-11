@@ -1,0 +1,35 @@
+{
+  "name": "apology-protocol",
+  "version": "0.0.0",
+  "description": "Validates typed, signed plan artifacts for agent sagas — a bad plan fails validation, not production.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Valerio Uberti",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/valeriouberti/apology-protocol"
+  },
+  "keywords": [
+    "agents",
+    "saga",
+    "compensation",
+    "validation",
+    "zod",
+    "mcp",
+    "a2a",
+    "ap2"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

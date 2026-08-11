@@ -1,0 +1,53 @@
+{
+  "$comment": "INVALID — pivot-ordering. The compliance check (s2) hits an external registry and is classed 'retriable': unproven, no rollback path. It sits BEFORE the pivot at index 3 (payments.capture). If it fails after earlier steps committed real state, there is nothing to compensate it with. Everything before the pivot must be compensable.",
+  "sagaId": "sg_01J8Z9",
+  "planVersion": 1,
+  "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
+  "signature": "ed25519:3q2mZk9vXw0pRt5uYh8jLn4bVc6xSd7f",
+  "pivotIndex": 3,
+  "mandate": {
+    "maxSpendEur": 250,
+    "expiresAt": "2027-08-07T18:00:00Z"
+  },
+  "steps": [
+    {
+      "id": "s0",
+      "tool": "vendor.create",
+      "class": "compensable",
+      "compensation": { "tool": "vendor.archive", "args": { "ref": "$s0.id" } },
+      "idempotencyKey": "sg_01J8Z9:s0"
+    },
+    {
+      "id": "s1",
+      "tool": "budget.reserve",
+      "class": "compensable",
+      "compensation": { "tool": "budget.release", "args": { "ref": "$s1.hold" } },
+      "undoTtlSeconds": 86400,
+      "idempotencyKey": "sg_01J8Z9:s1"
+    },
+    {
+      "id": "s2",
+      "tool": "compliance.check",
+      "class": "retriable",
+      "idempotencyKey": "sg_01J8Z9:s2"
+    },
+    {
+      "id": "s3",
+      "tool": "payments.capture",
+      "class": "irreversible",
+      "idempotencyKey": "sg_01J8Z9:s3"
+    },
+    {
+      "id": "s4",
+      "tool": "sandbox.provision",
+      "class": "retriable",
+      "idempotencyKey": "sg_01J8Z9:s4"
+    },
+    {
+      "id": "s5",
+      "tool": "email.credentials",
+      "class": "retriable",
+      "idempotencyKey": "sg_01J8Z9:s5"
+    }
+  ]
+}
