@@ -71,4 +71,28 @@ describe("validatePlan — the plan artifact schema", () => {
     const pivotErrors = result.errors.filter((e) => e.rule === "pivot-ordering");
     expect(pivotErrors).toHaveLength(2);
   });
+
+  it("collects errors across rules — one broken plan, every rule reports", () => {
+    // Retriable step before the pivot (pivot-ordering), an irreversible
+    // step shipping an undo (class-coherence), and a spend over the
+    // mandate (mandate) — all in one artifact, all reported at once.
+    const plan = structuredClone(loadFixture("pivot-before-unproven-step.json")) as {
+      steps: {
+        class: string;
+        compensation?: unknown;
+        maxSpendEur?: number;
+      }[];
+    };
+    plan.steps[3]!.compensation = { tool: "payments.refund" };
+    plan.steps[3]!.maxSpendEur = 400;
+
+    const result = validatePlan(plan, { now: new Date("2026-08-11T09:00:00Z") });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    const rules = new Set(result.errors.map((e) => e.rule));
+    expect(rules).toContain("pivot-ordering");
+    expect(rules).toContain("class-coherence");
+    expect(rules).toContain("mandate");
+  });
 });

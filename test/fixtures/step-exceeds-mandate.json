@@ -1,5 +1,5 @@
 {
-  "$comment": "The 6-step supplier onboarding saga from 'Agents Can Talk, But They Can't Commit'. The pivot sits at s3 (payments.capture): everything before it is compensable, everything at or after it is one-way. Past that line there is no rollback — only apology.",
+  "$comment": "INVALID — mandate. The payment capture (s3) declares a worst-case spend of 400 EUR, but the mandate — borrowed wholesale from AP2, bounded in money and in time — authorizes at most 250 EUR. The orchestrator refuses the plan if a step exceeds this.",
   "sagaId": "sg_01J8Z9",
   "planVersion": 1,
   "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
@@ -36,7 +36,7 @@
       "id": "s3",
       "tool": "payments.capture",
       "class": "irreversible",
-      "maxSpendEur": 180,
+      "maxSpendEur": 400,
       "idempotencyKey": "sg_01J8Z9:s3"
     },
     {

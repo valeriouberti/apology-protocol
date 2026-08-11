@@ -1,20 +1,35 @@
-import { PlanSchema, type Plan, type Rule, type ValidationError } from "./types.js";
+import {
+  PlanSchema,
+  type Plan,
+  type Rule,
+  type RuleContext,
+  type ValidationError,
+} from "./types.js";
 import { pivotOrdering } from "./rules/pivot-ordering.js";
+import { classCoherence } from "./rules/class-coherence.js";
+import { mandate } from "./rules/mandate.js";
 
-// One rule per failure mode from the article. Sessions 2–3 add
-// class-coherence, mandate, and undo-ttl here.
-const rules: Rule[] = [pivotOrdering];
+// One rule per failure mode from the article. Session 3 adds undo-ttl here.
+const rules: Rule[] = [pivotOrdering, classCoherence, mandate];
 
 export type ValidatePlanResult =
   | { ok: true; plan: Plan }
   | { ok: false; errors: ValidationError[] };
+
+export interface ValidatePlanOptions {
+  /** The instant to validate against (mandate expiry). Defaults to now. */
+  now?: Date;
+}
 
 /**
  * Validate an untrusted plan artifact. Returns the typed plan, or every
  * violation found — all errors, not fail-fast: a plan author needs the
  * full picture.
  */
-export function validatePlan(raw: unknown): ValidatePlanResult {
+export function validatePlan(
+  raw: unknown,
+  options: ValidatePlanOptions = {},
+): ValidatePlanResult {
   const parsed = PlanSchema.safeParse(raw);
   if (!parsed.success) {
     return {
@@ -29,7 +44,8 @@ export function validatePlan(raw: unknown): ValidatePlanResult {
     };
   }
 
-  const errors = rules.flatMap((rule) => rule(parsed.data));
+  const ctx: RuleContext = { now: options.now ?? new Date() };
+  const errors = rules.flatMap((rule) => rule(parsed.data, ctx));
   if (errors.length > 0) {
     return { ok: false, errors };
   }

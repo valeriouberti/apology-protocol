@@ -1,5 +1,5 @@
 {
-  "$comment": "The 6-step supplier onboarding saga from 'Agents Can Talk, But They Can't Commit'. The pivot sits at s3 (payments.capture): everything before it is compensable, everything at or after it is one-way. Past that line there is no rollback — only apology.",
+  "$comment": "INVALID — class-coherence. The payment capture (s3) claims class 'irreversible' AND ships a payments.refund compensation. A refund is a new payment, not an undo: the money moved, the fee was charged. A tool that claims irreversible and also ships an undo is lying about one of them.",
   "sagaId": "sg_01J8Z9",
   "planVersion": 1,
   "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
@@ -36,6 +36,7 @@
       "id": "s3",
       "tool": "payments.capture",
       "class": "irreversible",
+      "compensation": { "tool": "payments.refund", "args": { "ref": "$s3.charge" } },
       "maxSpendEur": 180,
       "idempotencyKey": "sg_01J8Z9:s3"
     },

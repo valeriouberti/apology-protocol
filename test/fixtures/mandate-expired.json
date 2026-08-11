@@ -1,5 +1,5 @@
 {
-  "$comment": "The 6-step supplier onboarding saga from 'Agents Can Talk, But They Can't Commit'. The pivot sits at s3 (payments.capture): everything before it is compensable, everything at or after it is one-way. Past that line there is no rollback — only apology.",
+  "$comment": "INVALID — mandate. The mandate expired at 2026-08-07T18:00:00Z. Bounded in money and in time: the plan must not outlive expiresAt, so validating it after that instant refuses it no matter how well-ordered the steps are.",
   "sagaId": "sg_01J8Z9",
   "planVersion": 1,
   "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
@@ -7,7 +7,7 @@
   "pivotIndex": 3,
   "mandate": {
     "maxSpendEur": 250,
-    "expiresAt": "2027-08-07T18:00:00Z"
+    "expiresAt": "2026-08-07T18:00:00Z"
   },
   "steps": [
     {

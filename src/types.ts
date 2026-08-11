@@ -25,6 +25,8 @@ export const StepSchema = z.strictObject({
   compensation: CompensationSchema.optional(),
   idempotencyKey: z.string().min(1),
   undoTtlSeconds: z.int().positive().optional(),
+  /** Worst-case spend of this step, checked against mandate.maxSpendEur. */
+  maxSpendEur: z.number().nonnegative().optional(),
 });
 export type Step = z.infer<typeof StepSchema>;
 
@@ -80,5 +82,11 @@ export interface ValidationError {
   message: string;
 }
 
+/** Ambient facts a rule may need beyond the plan itself. */
+export interface RuleContext {
+  /** The instant validation runs at — injectable for deterministic tests. */
+  now: Date;
+}
+
 /** A static check over an already well-shaped plan. */
-export type Rule = (plan: Plan) => ValidationError[];
+export type Rule = (plan: Plan, ctx: RuleContext) => ValidationError[];

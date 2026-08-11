@@ -23,8 +23,8 @@ which there is no rollback. Four static checks, one per failure mode:
 | Check | Rule | Status |
 | --- | --- | --- |
 | `pivot-ordering` | Everything before the pivot must be compensable; everything at or after it is one-way. | ✅ implemented |
-| `class-coherence` | A tool that claims "irreversible" and also ships an undo is lying about one of them. | ⏳ planned |
-| `mandate` | No step may exceed `maxSpendEur`; the plan must not outlive `expiresAt`. | ⏳ planned |
+| `class-coherence` | A tool that claims "irreversible" and also ships an undo is lying about one of them. | ✅ implemented |
+| `mandate` | No step may exceed `maxSpendEur`; the plan must not outlive `expiresAt`. | ✅ implemented |
 | `undo-ttl` | Worst-case time to reach the pivot must fit inside the shortest `undoTtlSeconds` on the path. | ⏳ planned |
 
 Pure validation library: no orchestrator, no LLM integration, no runtime
@@ -42,6 +42,9 @@ if (result.ok) {
 } else {
   result.errors; // ALL violations, not fail-fast — [{ rule, path, message }]
 }
+
+// Mandate expiry is checked against the clock; inject it for determinism:
+validatePlan(artifact, { now: new Date("2026-08-11T09:00:00Z") });
 ```
 
 ## The plan artifact
@@ -67,6 +70,7 @@ for the full 6-step saga from the article. The shape:
       "class": "compensable",               // compensable | retriable | irreversible
       "compensation": { "tool": "budget.release", "args": { "ref": "$s1.hold" } },
       "undoTtlSeconds": 86400,
+      "maxSpendEur": 180,                   // worst-case spend of this step (optional)
       "idempotencyKey": "sg_01J8Z9:s1"      // always `${sagaId}:${stepId}`
     }
   ]
@@ -82,6 +86,9 @@ should teach you the whole article:
 - [`pivot-before-unproven-step.json`](test/fixtures/pivot-before-unproven-step.json)
 - [`compensable-step-after-pivot.json`](test/fixtures/compensable-step-after-pivot.json)
 - [`pivot-index-out-of-bounds.json`](test/fixtures/pivot-index-out-of-bounds.json)
+- [`irreversible-with-compensation.json`](test/fixtures/irreversible-with-compensation.json)
+- [`step-exceeds-mandate.json`](test/fixtures/step-exceeds-mandate.json)
+- [`mandate-expired.json`](test/fixtures/mandate-expired.json)
 
 ## Development
 
