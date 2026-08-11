@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validatePlan } from "../src/index.js";
-import { loadExample, loadFixture } from "./helpers.js";
+import { loadExample, loadFixture, makePlan } from "./helpers.js";
 
 // The pivot is the line in the plan past which there is no rollback — only
 // apology. "Everything before it must be compensable; everything at or after
@@ -54,22 +54,13 @@ describe("pivot-ordering", () => {
   });
 
   it("allows the pivot at index 0 — a plan that is one-way from the first step", () => {
-    const result = validatePlan({
-      sagaId: "sg_ONEWAY",
-      planVersion: 1,
-      authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-      signature: "ed25519:abc",
-      pivotIndex: 0,
-      mandate: { maxSpendEur: 10, expiresAt: "2027-01-01T00:00:00Z" },
-      steps: [
-        {
-          id: "s0",
-          tool: "payments.capture",
-          class: "irreversible",
-          idempotencyKey: "sg_ONEWAY:s0",
-        },
-      ],
-    });
+    const result = validatePlan(
+      makePlan({
+        sagaId: "sg_ONEWAY",
+        pivotIndex: 0,
+        steps: [{ id: "s0", tool: "payments.capture", class: "irreversible" }],
+      }),
+    );
 
     expect(result.ok).toBe(true);
   });

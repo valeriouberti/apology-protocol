@@ -18,6 +18,16 @@ export const classCoherence: Rule = (plan) => {
           `claims irreversible and also ships an undo is lying about one of them`,
       });
     }
+    if (step.class === "compensable" && step.compensation === undefined) {
+      errors.push({
+        rule: "class-coherence",
+        path: ["steps", index, "compensation"],
+        message:
+          `step "${step.id}" (${step.tool}) declares class "compensable" ` +
+          `but ships no compensation: a step that claims it can be undone ` +
+          `must say how, or the rollback everyone is counting on does not exist`,
+      });
+    }
   }
 
   return errors;

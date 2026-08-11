@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validatePlan } from "../src/index.js";
-import { loadExample, loadFixture } from "./helpers.js";
+import { loadExample, loadFixture, makePlan } from "./helpers.js";
 
 // An undo with a TTL is a rollback path that expires. "The orchestrator
 // checks that the worst-case time to reach the pivot fits inside the
@@ -42,96 +42,71 @@ describe("undo-ttl", () => {
 
   it("passes a plan with no TTL on the path — nothing expires, nothing to prove", () => {
     // No pre-pivot step declares undoTtlSeconds, so missing durations are fine.
-    const result = validatePlan({
-      sagaId: "sg_NOTTL",
-      planVersion: 1,
-      authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-      signature: "ed25519:abc",
-      pivotIndex: 1,
-      mandate: { maxSpendEur: 10, expiresAt: "2027-01-01T00:00:00Z" },
-      steps: [
-        {
-          id: "s0",
-          tool: "vendor.create",
-          class: "compensable",
-          compensation: { tool: "vendor.archive" },
-          idempotencyKey: "sg_NOTTL:s0",
-        },
-        {
-          id: "s1",
-          tool: "payments.capture",
-          class: "irreversible",
-          idempotencyKey: "sg_NOTTL:s1",
-        },
-      ],
-    });
+    const result = validatePlan(
+      makePlan({
+        sagaId: "sg_NOTTL",
+        pivotIndex: 1,
+        steps: [
+          {
+            id: "s0",
+            tool: "vendor.create",
+            class: "compensable",
+            compensation: { tool: "vendor.archive" },
+          },
+          { id: "s1", tool: "payments.capture", class: "irreversible" },
+        ],
+      }),
+    );
 
     expect(result.ok).toBe(true);
   });
 
   it("passes when the worst-case path exactly equals the shortest TTL — 'fits inside' is inclusive", () => {
-    const result = validatePlan({
-      sagaId: "sg_EXACT",
-      planVersion: 1,
-      authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-      signature: "ed25519:abc",
-      pivotIndex: 2,
-      mandate: { maxSpendEur: 10, expiresAt: "2027-01-01T00:00:00Z" },
-      steps: [
-        {
-          id: "s0",
-          tool: "budget.reserve",
-          class: "compensable",
-          compensation: { tool: "budget.release" },
-          undoTtlSeconds: 3600,
-          maxDurationSeconds: 600,
-          idempotencyKey: "sg_EXACT:s0",
-        },
-        {
-          id: "s1",
-          tool: "compliance.check",
-          class: "compensable",
-          compensation: { tool: "compliance.discard" },
-          maxDurationSeconds: 3000,
-          idempotencyKey: "sg_EXACT:s1",
-        },
-        {
-          id: "s2",
-          tool: "payments.capture",
-          class: "irreversible",
-          idempotencyKey: "sg_EXACT:s2",
-        },
-      ],
-    });
+    const result = validatePlan(
+      makePlan({
+        sagaId: "sg_EXACT",
+        pivotIndex: 2,
+        steps: [
+          {
+            id: "s0",
+            tool: "budget.reserve",
+            class: "compensable",
+            compensation: { tool: "budget.release" },
+            undoTtlSeconds: 3600,
+            maxDurationSeconds: 600,
+          },
+          {
+            id: "s1",
+            tool: "compliance.check",
+            class: "compensable",
+            compensation: { tool: "compliance.discard" },
+            maxDurationSeconds: 3000,
+          },
+          { id: "s2", tool: "payments.capture", class: "irreversible" },
+        ],
+      }),
+    );
 
     expect(result.ok).toBe(true);
   });
 
   it("ignores TTLs at or after the pivot — the path ends where rollback ends", () => {
     // A TTL on a post-pivot step is inert: there is no rollback back there.
-    const result = validatePlan({
-      sagaId: "sg_POST",
-      planVersion: 1,
-      authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-      signature: "ed25519:abc",
-      pivotIndex: 0,
-      mandate: { maxSpendEur: 10, expiresAt: "2027-01-01T00:00:00Z" },
-      steps: [
-        {
-          id: "s0",
-          tool: "payments.capture",
-          class: "irreversible",
-          idempotencyKey: "sg_POST:s0",
-        },
-        {
-          id: "s1",
-          tool: "sandbox.provision",
-          class: "retriable",
-          undoTtlSeconds: 60,
-          idempotencyKey: "sg_POST:s1",
-        },
-      ],
-    });
+    const result = validatePlan(
+      makePlan({
+        sagaId: "sg_POST",
+        pivotIndex: 0,
+        steps: [
+          { id: "s0", tool: "payments.capture", class: "irreversible" },
+          {
+            id: "s1",
+            tool: "sandbox.provision",
+            class: "retriable",
+            undoTtlSeconds: 60,
+          },
+        ],
+      }),
+    );
 
     expect(result.ok).toBe(true);
   });

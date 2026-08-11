@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validatePlan } from "../src/index.js";
-import { loadExample, loadFixture } from "./helpers.js";
+import { loadExample, loadFixture, makePlan } from "./helpers.js";
 
 // A step's class is a claim about the world. The compensation field is
 // another claim. class-coherence checks they don't contradict each other.
@@ -27,23 +27,28 @@ describe("class-coherence", () => {
     );
   });
 
+  it("fails a compensable step that ships no compensation — the promised undo must exist", () => {
+    // s2 claims it can be undone but never says how. Everyone before the
+    // pivot is counting on that rollback path; it does not exist.
+    const result = validatePlan(loadFixture("compensable-without-compensation.json"));
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors).toHaveLength(1);
+    const error = result.errors[0]!;
+    expect(error.rule).toBe("class-coherence");
+    expect(error.path).toEqual(["steps", 2, "compensation"]);
+    expect(error.message).toContain("ships no compensation");
+  });
+
   it("allows a retriable step without a compensation — retry is its recovery story", () => {
-    const result = validatePlan({
-      sagaId: "sg_RETRY",
-      planVersion: 1,
-      authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-      signature: "ed25519:abc",
-      pivotIndex: 0,
-      mandate: { maxSpendEur: 10, expiresAt: "2027-01-01T00:00:00Z" },
-      steps: [
-        {
-          id: "s0",
-          tool: "email.credentials",
-          class: "retriable",
-          idempotencyKey: "sg_RETRY:s0",
-        },
-      ],
-    });
+    const result = validatePlan(
+      makePlan({
+        sagaId: "sg_RETRY",
+        pivotIndex: 0,
+        steps: [{ id: "s0", tool: "email.credentials", class: "retriable" }],
+      }),
+    );
 
     expect(result.ok).toBe(true);
   });

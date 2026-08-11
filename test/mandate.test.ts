@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validatePlan } from "../src/index.js";
-import { loadExample, loadFixture } from "./helpers.js";
+import { loadExample, loadFixture, makePlan } from "./helpers.js";
 
 // The mandate is borrowed wholesale from AP2: bounded in money and in time.
 describe("mandate", () => {
@@ -30,11 +30,8 @@ describe("mandate", () => {
 
   it("allows a step spending exactly maxSpendEur — the bound is inclusive", () => {
     const result = validatePlan(
-      {
+      makePlan({
         sagaId: "sg_EDGE",
-        planVersion: 1,
-        authoredBy: { agent: "planner@acme", model: "claude-opus-5" },
-        signature: "ed25519:abc",
         pivotIndex: 0,
         mandate: { maxSpendEur: 250, expiresAt: "2027-01-01T00:00:00Z" },
         steps: [
@@ -43,10 +40,9 @@ describe("mandate", () => {
             tool: "payments.capture",
             class: "irreversible",
             maxSpendEur: 250,
-            idempotencyKey: "sg_EDGE:s0",
           },
         ],
-      },
+      }),
       { now: new Date("2026-08-11T09:00:00Z") },
     );
 

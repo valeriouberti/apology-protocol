@@ -23,7 +23,7 @@ which there is no rollback. Four static checks, one per failure mode:
 | Check | Rule | Status |
 | --- | --- | --- |
 | `pivot-ordering` | Everything before the pivot must be compensable; everything at or after it is one-way. | ✅ implemented |
-| `class-coherence` | A tool that claims "irreversible" and also ships an undo is lying about one of them. | ✅ implemented |
+| `class-coherence` | A tool that claims "irreversible" and also ships an undo is lying about one of them — and a compensable step must ship the undo it promises. | ✅ implemented |
 | `mandate` | No step may exceed `maxSpendEur`; the plan must not outlive `expiresAt`. | ✅ implemented |
 | `undo-ttl` | Worst-case time to reach the pivot must fit inside the shortest `undoTtlSeconds` on the path. | ✅ implemented |
 
@@ -106,6 +106,7 @@ should teach you the whole article:
 - [`mandate-expired.json`](test/fixtures/mandate-expired.json)
 - [`undo-ttl-shorter-than-path.json`](test/fixtures/undo-ttl-shorter-than-path.json)
 - [`unbounded-wait-inside-undo-window.json`](test/fixtures/unbounded-wait-inside-undo-window.json)
+- [`compensable-without-compensation.json`](test/fixtures/compensable-without-compensation.json)
 
 ## Development
 

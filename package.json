@@ -1,6 +1,6 @@
 {
   "name": "apology-protocol",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Validates typed, signed plan artifacts for agent sagas — a bad plan fails validation, not production.",
   "type": "module",
   "license": "MIT",

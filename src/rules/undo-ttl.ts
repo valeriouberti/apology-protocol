@@ -14,20 +14,15 @@ export const undoTtl: Rule = (plan) => {
 
   const path = steps.slice(0, pivotIndex);
 
-  let shortestTtl: number | undefined;
-  let shortestTtlIndex = -1;
-  for (const [index, step] of path.entries()) {
-    if (step.undoTtlSeconds !== undefined) {
-      if (shortestTtl === undefined || step.undoTtlSeconds < shortestTtl) {
-        shortestTtl = step.undoTtlSeconds;
-        shortestTtlIndex = index;
-      }
-    }
-  }
-  if (shortestTtl === undefined) {
+  const ttlSteps = path.filter((step) => step.undoTtlSeconds !== undefined);
+  if (ttlSteps.length === 0) {
     return []; // no undo on the path expires — nothing to prove
   }
-  const ttlStep = path[shortestTtlIndex]!;
+  const ttlStep = ttlSteps.reduce((shortest, step) =>
+    step.undoTtlSeconds! < shortest.undoTtlSeconds! ? step : shortest,
+  );
+  const shortestTtl = ttlStep.undoTtlSeconds!;
+  const shortestTtlIndex = path.indexOf(ttlStep);
 
   const errors: ValidationError[] = [];
   for (const [index, step] of path.entries()) {
