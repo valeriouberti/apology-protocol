@@ -1,5 +1,5 @@
 {
-  "$comment": "INVALID — class-coherence. The payment capture (s3) claims class 'irreversible' AND ships a payments.refund compensation. A refund is a new payment, not an undo: the money moved, the fee was charged. A tool that claims irreversible and also ships an undo is lying about one of them.",
+  "$comment": "INVALID — undo-ttl. The human review (s2) declares no maxDurationSeconds: a person might approve in a minute or go on holiday for two weeks. The budget hold (s1) auto-releases after 86400s. An unbounded wait cannot sit inside a bounded undo window — the worst-case time to reach the pivot cannot even be computed, so it cannot be proven to fit. Give the human a deadline.",
   "sagaId": "sg_01J8Z9",
   "planVersion": 1,
   "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
@@ -29,17 +29,15 @@
     },
     {
       "id": "s2",
-      "tool": "compliance.check",
+      "tool": "approvals.humanReview",
       "class": "compensable",
-      "compensation": { "tool": "compliance.discard", "args": { "ref": "$s2.report" } },
-      "maxDurationSeconds": 3600,
+      "compensation": { "tool": "approvals.void", "args": { "ref": "$s2.ticket" } },
       "idempotencyKey": "sg_01J8Z9:s2"
     },
     {
       "id": "s3",
       "tool": "payments.capture",
       "class": "irreversible",
-      "compensation": { "tool": "payments.refund", "args": { "ref": "$s3.charge" } },
       "maxSpendEur": 180,
       "idempotencyKey": "sg_01J8Z9:s3"
     },

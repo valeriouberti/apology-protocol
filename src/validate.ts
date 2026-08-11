@@ -8,9 +8,10 @@ import {
 import { pivotOrdering } from "./rules/pivot-ordering.js";
 import { classCoherence } from "./rules/class-coherence.js";
 import { mandate } from "./rules/mandate.js";
+import { undoTtl } from "./rules/undo-ttl.js";
 
-// One rule per failure mode from the article. Session 3 adds undo-ttl here.
-const rules: Rule[] = [pivotOrdering, classCoherence, mandate];
+// One rule per failure mode from the article.
+const rules: Rule[] = [pivotOrdering, classCoherence, mandate, undoTtl];
 
 export type ValidatePlanResult =
   | { ok: true; plan: Plan }

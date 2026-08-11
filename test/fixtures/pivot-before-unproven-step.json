@@ -15,6 +15,7 @@
       "tool": "vendor.create",
       "class": "compensable",
       "compensation": { "tool": "vendor.archive", "args": { "ref": "$s0.id" } },
+      "maxDurationSeconds": 60,
       "idempotencyKey": "sg_01J8Z9:s0"
     },
     {
@@ -23,12 +24,14 @@
       "class": "compensable",
       "compensation": { "tool": "budget.release", "args": { "ref": "$s1.hold" } },
       "undoTtlSeconds": 86400,
+      "maxDurationSeconds": 60,
       "idempotencyKey": "sg_01J8Z9:s1"
     },
     {
       "id": "s2",
       "tool": "compliance.check",
       "class": "retriable",
+      "maxDurationSeconds": 3600,
       "idempotencyKey": "sg_01J8Z9:s2"
     },
     {

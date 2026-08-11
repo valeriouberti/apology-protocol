@@ -27,6 +27,13 @@ export const StepSchema = z.strictObject({
   undoTtlSeconds: z.int().positive().optional(),
   /** Worst-case spend of this step, checked against mandate.maxSpendEur. */
   maxSpendEur: z.number().nonnegative().optional(),
+  /**
+   * Worst-case duration of this step — operationally, its timeout. Omitted
+   * means the wait is unbounded: undo-ttl then refuses the plan whenever an
+   * undo TTL is at stake before the pivot, because the path time cannot be
+   * proven to fit.
+   */
+  maxDurationSeconds: z.int().nonnegative().optional(),
 });
 export type Step = z.infer<typeof StepSchema>;
 

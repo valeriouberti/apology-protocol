@@ -24,3 +24,4 @@ export {
 export { pivotOrdering } from "./rules/pivot-ordering.js";
 export { classCoherence } from "./rules/class-coherence.js";
 export { mandate } from "./rules/mandate.js";
+export { undoTtl } from "./rules/undo-ttl.js";
