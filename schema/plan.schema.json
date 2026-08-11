@@ -1,0 +1,147 @@
+{
+  "$id": "https://raw.githubusercontent.com/valeriouberti/apology-protocol/main/schema/plan.schema.json",
+  "title": "Plan artifact (apology-protocol)",
+  "description": "A typed, signed plan artifact for agent sagas. Shape only — pivot-ordering, undo-ttl, mandate, and class-coherence are cross-field checks enforced by validatePlan.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "sagaId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "planVersion": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "authoredBy": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "agent",
+        "model"
+      ],
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pivotIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "mandate": {
+      "type": "object",
+      "properties": {
+        "maxSpendEur": {
+          "type": "number",
+          "minimum": 0
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        }
+      },
+      "required": [
+        "maxSpendEur",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "steps": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tool": {
+            "type": "string",
+            "minLength": 1
+          },
+          "class": {
+            "type": "string",
+            "enum": [
+              "compensable",
+              "retriable",
+              "irreversible"
+            ]
+          },
+          "compensation": {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "minLength": 1
+              },
+              "args": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "additionalProperties": false
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "undoTtlSeconds": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "maxSpendEur": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxDurationSeconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "tool",
+          "class",
+          "idempotencyKey"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "sagaId",
+    "planVersion",
+    "authoredBy",
+    "signature",
+    "pivotIndex",
+    "mandate",
+    "steps"
+  ],
+  "additionalProperties": false
+}

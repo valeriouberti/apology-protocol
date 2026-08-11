@@ -78,6 +78,20 @@ for the full 6-step saga from the article. The shape:
 }
 ```
 
+## JSON Schema
+
+The Zod schema is the source of truth; a JSON Schema (draft 2020-12) is
+generated from it for non-TypeScript consumers:
+
+```ts
+import { planJsonSchema } from "apology-protocol"; // at runtime
+import schema from "apology-protocol/schema.json"; // or the generated file
+```
+
+The checked-in [`schema/plan.schema.json`](schema/plan.schema.json) is kept
+honest by a test; regenerate it with `npm run schema`. It describes the shape
+only — the four checks are cross-field rules JSON Schema cannot express.
+
 ## Tests as documentation
 
 The fixtures in [`test/fixtures/`](test/fixtures/) are one file per failure
@@ -99,4 +113,6 @@ should teach you the whole article:
 npm install
 npm test           # vitest run
 npm run typecheck  # tsc --noEmit
+npm run build      # emit dist/ (ESM + .d.ts)
+npm run schema     # regenerate schema/plan.schema.json from the Zod schema
 ```

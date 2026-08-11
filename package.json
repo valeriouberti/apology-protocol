@@ -1,6 +1,6 @@
 {
   "name": "apology-protocol",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Validates typed, signed plan artifacts for agent sagas — a bad plan fails validation, not production.",
   "type": "module",
   "license": "MIT",
@@ -9,6 +9,7 @@
     "type": "git",
     "url": "https://github.com/valeriouberti/apology-protocol"
   },
+  "homepage": "https://www.valeriouberti.dev/articles/agents-can-talk-but-they-cannot-commit",
   "keywords": [
     "agents",
     "saga",
@@ -19,10 +20,32 @@
     "a2a",
     "ap2"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema.json": "./schema/plan.schema.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "schema",
+    "examples"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "schema": "npm run build && node scripts/generate-schema.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run schema"
   },
   "dependencies": {
     "zod": "^4.4.3"
