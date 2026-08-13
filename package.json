@@ -7,7 +7,10 @@
   "author": "Valerio Uberti",
   "repository": {
     "type": "git",
-    "url": "https://github.com/valeriouberti/apology-protocol"
+    "url": "git+https://github.com/valeriouberti/apology-protocol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/valeriouberti/apology-protocol/issues"
   },
   "homepage": "https://www.valeriouberti.dev/articles/agents-can-talk-but-they-cannot-commit",
   "keywords": [
