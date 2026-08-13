@@ -1,6 +1,7 @@
 # apology-protocol
 
 [![CI](https://github.com/valeriouberti/apology-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/valeriouberti/apology-protocol/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/apology-protocol)](https://www.npmjs.com/package/apology-protocol)
 
 > Agents can talk. They can't commit. Past the pivot there is no rollback —
 > only apology. This library validates typed plan artifacts so that a bad
