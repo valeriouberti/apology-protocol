@@ -22,8 +22,13 @@ Temporal/Restate/DBOS. Zod is the only runtime dependency.
 
 ## Status
 - v0.0.1 published to npm on 2026-08-11 (name reserved). package.json is at
-  0.1.0, unpublished — publish is done manually by Valerio (`npm publish`;
-  prepublishOnly runs typecheck + tests + build + schema regeneration).
+  0.2.0, unpublished. Releases are automated: on push to main, CI's release
+  job publishes to npm, tags v<version>, and creates a GitHub release with
+  that version's CHANGELOG section — but only when package.json holds a
+  version not yet on npm, so a version bump is what triggers a release
+  (needs the NPM_TOKEN repo secret; prepublishOnly runs typecheck + tests +
+  build + schema regeneration). Claude never bumps/pushes to trigger this —
+  that stays Valerio's call.
 - All four checks from the article are implemented, plus the v0.2
   class-coherence extension (see below).
 - 0.2.0 adds canonical-bytes idempotency keys (A2A §8.4.1 alignment,
@@ -100,7 +105,8 @@ Temporal/Restate/DBOS. Zod is the only runtime dependency.
   with a `$comment` explaining it. examples/supplier-onboarding.json is the
   valid 6-step saga from the article (pivot at s3, payments.capture).
 - scripts/generate-schema.mjs (runs against dist/), tsconfig.build.json
-  (emits dist/), .github/workflows/ci.yml (typecheck, test, schema no-drift).
+  (emits dist/), .github/workflows/ci.yml (typecheck, test, schema no-drift;
+  release job: npm publish + tag + GitHub release on version bump to main).
 
 ## Design rules
 - TypeScript strict (NodeNext, noUncheckedIndexedAccess). Zod for schema.
