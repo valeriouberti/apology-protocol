@@ -62,13 +62,22 @@ export const PlanSchema = z
   .superRefine((plan, ctx) => {
     for (const [index, step] of plan.steps.entries()) {
       const expected = `${plan.sagaId}:${step.id}`;
-      if (step.idempotencyKey !== expected) {
+      // The canonical-bytes form with a SHA-256 hex
+      // suffix (whether that hash matches the step's bytes is the
+      // key-integrity rule's question, not the schema's).
+      const wellFormed =
+        step.idempotencyKey === expected ||
+        (step.idempotencyKey.startsWith(`${expected}:`) &&
+          /^[0-9a-f]{64}$/.test(step.idempotencyKey.slice(expected.length + 1)));
+      if (!wellFormed) {
         ctx.addIssue({
           code: "custom",
           path: ["steps", index, "idempotencyKey"],
           message:
-            `idempotencyKey must be derived as \`\${sagaId}:\${stepId}\` — ` +
-            `expected "${expected}", got "${step.idempotencyKey}"`,
+            `idempotencyKey must be derived as \`\${sagaId}:\${stepId}\` or ` +
+            `\`\${sagaId}:\${stepId}:\${sha256hex}\` — ` +
+            `expected "${expected}" (with an optional canonical-bytes hash ` +
+            `suffix), got "${step.idempotencyKey}"`,
         });
       }
     }
@@ -80,7 +89,8 @@ export type RuleName =
   | "pivot-ordering"
   | "undo-ttl"
   | "mandate"
-  | "class-coherence";
+  | "class-coherence"
+  | "key-integrity";
 
 /** One violation. validatePlan collects all of them — never fail-fast. */
 export interface ValidationError {
