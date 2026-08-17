@@ -1,0 +1,21 @@
+{
+  "$comment": "VALID — the other half of the presence-divergence pair (the §5.7 fixture from the A2A thread). This plan sets the step's maxSpendEur explicitly to 0, the documented effective default; its twin, presence-divergence-omitted.json, omits the field. Same validator semantics, different authored bytes: explicitly-set fields are included in the canonical form even when the value equals the default, so this plan's key MUST differ from its twin's.",
+  "sagaId": "sg_01J8Z9",
+  "planVersion": 1,
+  "authoredBy": { "agent": "planner@acme", "model": "claude-opus-5" },
+  "signature": "ed25519:3q2mZk9vXw0pRt5uYh8jLn4bVc6xSd7f",
+  "pivotIndex": 0,
+  "mandate": {
+    "maxSpendEur": 250,
+    "expiresAt": "2027-08-07T18:00:00Z"
+  },
+  "steps": [
+    {
+      "id": "s0",
+      "tool": "sandbox.provision",
+      "class": "retriable",
+      "maxSpendEur": 0,
+      "idempotencyKey": "sg_01J8Z9:s0:0f4bbc29cb23a12d41155217421e54a3277f6df32d9bd86ff473d34aa42bf0e9"
+    }
+  ]
+}
